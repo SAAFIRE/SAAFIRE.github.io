@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Will You Marry Me?</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: 'Arial', sans-serif;
+      background-image: linear-gradient(to right, #ffafbd, #ffc3a0);
+      background-size: cover;
+      color: #ff6f91;
+      margin: 0;
+      overflow: hidden;
+      position: relative;
+    }
+    .container {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .question {
+      font-size: 3em;
+      margin-bottom: 30px;
+      color: #ff4d6d;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    .buttons {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      position: relative;
+    }
+    .button {
+      padding: 15px 30px;
+      font-size: 1.5em;
+      cursor: pointer;
+      border: none;
+      border-radius: 30px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      outline: none;
+    }
+    .yes {
+      background-color: #ff4d6d;
+      color: white;
+    }
+    .no {
+      background-color: #ffcccb;
+      color: black;
+    }
+    .message {
+      font-size: 1.5em;
+      margin-top: 30px;
+      color: #ff80ab;
+      font-weight: bold;
+    }
+    .arrow {
+      position: absolute;
+      display: none;
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 30px solid #ff4d6d;
+      animation: bounce 0.5s infinite;
+    }
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-10px);
+      }
+      60% {
+        transform: translateY(-5px);
+      }
+    }
+    .sparkle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: radial-gradient(circle, #ffb3d9 0%, transparent 70%);
+      animation: sparkle-animation 1s forwards;
+    }
+    @keyframes sparkle-animation {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(3);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="question">Will you marry me?</div>
+    <div class="buttons">
+      <button class="button yes" onclick="yes()">Yes</button>
+      <button class="button no" onclick="no()">No</button>
+    </div>
+    <div class="message" id="message"></div>
+    <!-- Arrows that point to the "Yes" button -->
+    <div class="arrow" id="arrow1"></div>
+    <div class="arrow" id="arrow2"></div>
+    <div class="arrow" id="arrow3"></div>
+    <div class="arrow" id="arrow4"></div>
+  </div>
+
+  <script>
+    const messages = [
+      "Please click yes!",
+      "Are you sure? Try yes!",
+      "Pretty please? Just click yes!",
+      "You know you want to click yes!",
+      "Don’t make me wait, press yes!",
+      "Imagine the fun if you click yes!"
+    ];
+
+    let messageIndex = 0;
+    let noClickCount = 0;
+
+    function createSparkle(x, y) {
+      const sparkle = document.createElement('div');
+      sparkle.className = 'sparkle';
+      sparkle.style.left = \`\${x}px\`;
+      sparkle.style.top = \`\${y}px\`;
+      document.body.appendChild(sparkle);
+      setTimeout(() => sparkle.remove(), 1000);
+    }
+
+    function yes() {
+      const yesButton = document.querySelector('.yes');
+      yesButton.style.fontSize = \`\${parseFloat(getComputedStyle(yesButton).fontSize) * 1.2}px\`;
+      document.querySelector('.question').textContent = "She said YES!";
+      document.querySelector('.buttons').style.display = "none";
+      document.getElementById('message').textContent = "I can't wait to spend forever with you!";
+      createSparkle(window.innerWidth / 2, window.innerHeight / 2);
+    }
+
+    function no() {
+      noClickCount++;
+
+      const yesButton = document.querySelector('.yes');
+      const noButton = document.querySelector('.no');
+      const arrows = document.querySelectorAll('.arrow');
+
+      document.getElementById('message').textContent = messages[messageIndex % messages.length];
+      messageIndex++;
+
+      if (noClickCount >= 3) {
+        arrows.forEach(arrow => {
+          arrow.style.display = 'block';
+          arrow.style.left = \`\${yesButton.offsetLeft + yesButton.offsetWidth / 2 - 10}px\`;
+          arrow.style.top = \`\${yesButton.offsetTop - 50}px\`;
+        });
+      }
+
+      yesButton.style.fontSize = \`\${1.5 + (noClickCount * 0.1)}em\`;
+      noButton.style.fontSize = \`\${1.5 - (noClickCount * 0.1)}em\`;
+      noButton.style.transition = 'font-size 0.3s ease';
+
+      // Randomly position the "No" button within bounds
+      if (noClickCount >= 2 && noClickCount < 7) {
+        const maxX = window.innerWidth - noButton.offsetWidth - 20; // Adjust for screen width
+        const maxY = window.innerHeight - noButton.offsetHeight - 20; // Adjust for screen height
+
+        let randomX, randomY;
+
+        do {
+          randomX = Math.random() * maxX;
+          randomY = Math.random() * maxY;
+        } while (randomX < 0 || randomY < 0); // Ensure it's within bounds
+
+        noButton.style.position = 'absolute'; 
+        noButton.style.left = \`\${randomX}px\`;
+        noButton.style.top = \`\${randomY}px\`;
+      }
+
+      if (noClickCount === 7) {
+        noButton.style.display = "none"; 
+        yesButton.style.width = "100vw";
+        yesButton.style.height = "100vh";
+        yesButton.style.fontSize = "5em"; 
+        yesButton.style.position = "absolute"; 
+        yesButton.style.left = "0"; 
+        yesButton.style.top = "0"; 
+        document.getElementById('message').textContent = "Forever starts now!"; 
+      }
+
+      createSparkle(event.clientX, event.clientY);
+    }
+  </script>
+</body>
+</html>
